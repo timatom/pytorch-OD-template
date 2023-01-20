@@ -6,8 +6,10 @@ ENV TZ=US/Eastern
 # Install timezone
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# Set noninteractive mode for apt-get
+ENV DEBIAN_FRONTEND noninteractive
+
 # Install python3, pip, and git
-# RUN apt-get update && apt-get install -y python3 python3-pip
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y python3.10 python3-pip && \
@@ -21,6 +23,9 @@ RUN python -m pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https:
 
 # Install OpenCV
 RUN pip install opencv-python
+
+# Install evaluation tools
+RUN pip install fiftyone
 
 # Make container directories and copy content from host
 RUN mkdir /home/src
