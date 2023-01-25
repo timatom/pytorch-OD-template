@@ -1,5 +1,10 @@
 FROM ubuntu:20.04
 
+# Defining versions for python and libraries
+ARG PYTHON_VERSION=3.10
+ARG PYTORCH_VERSION=1.9.0
+ARG TORCHVISION_VERSION=0.10.0
+
 # Set timezone
 ENV TZ=US/Eastern
 
@@ -10,22 +15,54 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install python3, pip, and git
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y python3.10 python3-pip && \
-    apt-get install -y git
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get --no-install-recommends install -y \
+        build-essential \
+        ca-certificates \
+        cmake \
+        cmake-data \
+        pkg-config \
+        libcurl4 \
+        libsm6 \
+        libxext6 \
+        libssl-dev \
+        libffi-dev \
+        libxml2-dev \
+        libxslt1-dev \
+        zlib1g-dev \
+        unzip \
+        curl \
+        wget \
+        python${PYTHON_VERSION} \
+        # python${PYTHON_VERSION}-dev \
+        # python${PYTHON_VERSION}-distutils \
+        ffmpeg \
+    && apt-get install -y git
+
+# TODO: Install Voxel51 dependencies
+# Note: Refer to the following links for more information
+#       1. https://github.com/voxel51/fiftyone/blob/develop/Dockerfile
+#       2. https://github.com/aegean-ai/fiftyone-examples
+#       3. https://docs.voxel51.com/getting_started/install.html
 
 # Create symbolic link for python3
-RUN ln -s $(which python3) /usr/local/bin/python
+RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/local/bin/python \
+    && ln -s /usr/local/lib/python${PYTHON_VERSION} /usr/local/lib/python
+
+# Install and update pip
+# TODO: Figure out why I'm getting "pip module not found" error!!!
+RUN apt-get install -y python3-pip
+RUN pip install --upgrade pip
 
 # Install PyTorch and Torchvision
-RUN python -m pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install torch==${PYTORCH_VERSION}+cu111 torchvision==${TORCHVISION_VERSION}+cu111 -f https://download.pytorch.org/whl/torch_stable.html
 
 # Install OpenCV
 RUN pip install opencv-python
 
 # Install evaluation tools
-RUN pip install fiftyone
+RUN pip --no-cache-dir install fiftyone
 
 # Make container directories and copy content from host
 RUN mkdir /home/src
