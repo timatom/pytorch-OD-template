@@ -62,7 +62,7 @@ RUN pip install torch==${PYTORCH_VERSION}+cu111 torchvision==${TORCHVISION_VERSI
 RUN pip install opencv-python
 
 # Install evaluation tools
-RUN pip --no-cache-dir install fiftyone
+RUN pip --no-cache-dir install fiftyone pycocotools
 
 # Make container directories and copy content from host
 RUN mkdir /home/src
