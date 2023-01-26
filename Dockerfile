@@ -2,8 +2,9 @@ FROM ubuntu:20.04
 
 # Defining versions for python and libraries
 ARG PYTHON_VERSION=3.10
-ARG PYTORCH_VERSION=1.9.0
-ARG TORCHVISION_VERSION=0.10.0
+ARG PYTORCH_VERSION=1.13.1
+ARG TORCHVISION_VERSION=0.14.1
+ARG CUDA_VERSION=cu117
 
 # Set timezone
 ENV TZ=US/Eastern
@@ -56,13 +57,16 @@ RUN apt-get install -y python3-pip
 RUN pip install --upgrade pip
 
 # Install PyTorch and Torchvision
-RUN pip install torch==${PYTORCH_VERSION}+cu111 torchvision==${TORCHVISION_VERSION}+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install torch==${PYTORCH_VERSION}+${CUDA_VERSION} torchvision==${TORCHVISION_VERSION}+${CUDA_VERSION} -f https://download.pytorch.org/whl/torch_stable.html
 
 # Install OpenCV
 RUN pip install opencv-python
 
 # Install evaluation tools
 RUN pip --no-cache-dir install fiftyone pycocotools
+
+# Install other libraries
+RUN pip install tqdm
 
 # Make container directories and copy content from host
 RUN mkdir /home/src
