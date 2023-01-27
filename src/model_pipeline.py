@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from data_factory import DataFactory
-from model_factory import ModelFactory
+from data.data_factory import DataFactory
+from models.model_factory import ModelFactory
 
 # Import the models
 from torchvision.models.detection import (fasterrcnn_resnet50_fpn, 
