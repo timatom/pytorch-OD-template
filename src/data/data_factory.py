@@ -4,9 +4,10 @@ import json
 from PIL import Image
 
 from torchvision import transforms
-from data import ann_transforms
 from torch.utils.data import DataLoader
-from data.dataset import CustomDataset
+
+from src.data import ann_transforms
+from src.data.dataset import CustomDataset
 
 class DataFactory:
     def __init__(self, data_path):
