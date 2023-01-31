@@ -12,3 +12,8 @@ setup(
     ),
     # ...
 )
+
+# NOTE: For a quickstart, run the following command:
+#           $ pip install --editable .
+
+# NOTE 2: For more information, see: https://setuptools.pypa.io/en/latest/userguide/quickstart.html#development-mode

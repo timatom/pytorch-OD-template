@@ -69,5 +69,6 @@ RUN pip --no-cache-dir install fiftyone pycocotools
 RUN pip install tqdm
 
 # Make container directories and copy content from host
-RUN mkdir /home/src
-COPY ./src /home/src
+RUN mkdir -p /workspace
+WORKDIR /workspace
+COPY . /workspace
