@@ -1,7 +1,10 @@
+# TODO: Need to decide if this script belongs to the main `src` directory or if it belongs to the `src/models` package.
+
 from pathlib import Path
 
-from data.data_factory import DataFactory
-from models.model_factory import ModelFactory
+# from model_factory import ModelFactory
+from src.data.data_factory import DataFactory
+from src.models.model_factory import ModelFactory
 
 # Import the models
 from torchvision.models.detection import (fasterrcnn_resnet50_fpn, 
