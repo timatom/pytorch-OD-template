@@ -7,7 +7,7 @@ from torchvision import transforms
 # TODO: Make training script work with inputs and outputs defined by the data and annotations, not by the model itself.
 #       That is, the model's inputs and outputs should automatically adjust to the data and annotations.
 class ModelFactory:
-    def __init__(self, data_factory, model_arch):
+    def __init__(self, data_factory, model):
         '''
         Initializes the ModelFactory.
         '''
@@ -17,26 +17,10 @@ class ModelFactory:
         # Define the device
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         
-        # TODO: Make it possible to use a custom model when using the create_model method instead.
-        self.model = self.get_pretraing_model(model_arch)
+        self.model = model
         
         # Move the model to the device
         self.model.to(self.device)
-    
-    def create_model(self):
-        '''
-        Creates a model using the data_factory.
-        '''
-        return None
-    
-    def get_pretraing_model(self, model_arch, weights='COCO_V1'):
-        '''
-        Get a pre-trained model.
-        '''
-        # Load a pre-trained model
-        model = model_arch(weights=weights, pretrained=True)
-        
-        return model
     
     def epoch_train(self, data_loader, optimizer, device):
         '''
@@ -51,6 +35,8 @@ class ModelFactory:
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
             
             # Forward pass
+            # TODO: Need to resolve the following error when running the training script:
+            #       "TypeError: forward() takes 2 positional arguments but 3 were given"
             losses = self.model(images, targets)
             
             # Compute the total loss
