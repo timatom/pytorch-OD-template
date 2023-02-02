@@ -7,7 +7,7 @@ from torchvision import transforms
 # TODO: Make training script work with inputs and outputs defined by the data and annotations, not by the model itself.
 #       That is, the model's inputs and outputs should automatically adjust to the data and annotations.
 class ModelFactory:
-    def __init__(self, data_factory, model):
+    def __init__(self, data_factory, model, loss_fn):
         '''
         Initializes the ModelFactory.
         '''
@@ -21,6 +21,8 @@ class ModelFactory:
         
         # Move the model to the device
         self.model.to(self.device)
+        
+        self.loss_fn = loss_fn
     
     def epoch_train(self, data_loader, optimizer, device):
         '''
@@ -35,9 +37,10 @@ class ModelFactory:
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
             
             # Forward pass
-            # TODO: Need to resolve the following error when running the training script:
-            #       "TypeError: forward() takes 2 positional arguments but 3 were given"
-            losses = self.model(images, targets)
+            output = self.model(images)
+            
+            # Compute the loss
+            losses = self.loss_fn(output, targets)
             
             # Compute the total loss
             loss = sum(loss for loss in losses.values())
