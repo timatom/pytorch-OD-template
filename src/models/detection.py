@@ -1,42 +1,53 @@
 '''
-This module contains built model architectures for object detection.
+This module contains built model architectures for object detection models.
+
+Note: Function name typically takes the form of {backbone}_{neck}_{head}. The reason is remind
+      others that data flows from the backbone to the neck to the head in that order within neural networks.
 '''
 
 from src.models.builders.model_builder import NeuralNetBuilder
 
-from src.models.archs.mobilenet import MobileNetBackbone, MobileNetNeck, MobileNetHead
-from src.models.archs.resnet import ResNetBackbone, ResNetNeck, ResNetHead
-# from src.models.detection.ssd import SSDBackbone, SSDNeck, SSDHead
+# Import custom architectures
+from src.models.archs.resnet import ResNetBackbone
+from src.models.archs.fpn import FPNNeck
+from src.models.archs.retinanet import RetinaNetHead
 
-def mobilenet():
+# Import custom architectures blocks and bottlenecks
+from src.models.archs.blocks.resnet import ResNetBlock, ResNetBottleneck
+from src.models.archs.blocks.fpn import FPNBlock
+
+def resnet_fpn_retinanet():
     '''
-    Builds a MobileNet model.
+    Builds a model with a custom head, backbone, and neck.
     '''
+    # Configuring the model's backbone
+    in_channels = 3
+    out_channels = 64
+    
+    resnet_block = ResNetBlock
+    resnet_block_layers = [3, 4, 6, 3]
+    
+    resnet = ResNetBackbone(resnet_block, resnet_block_layers, num_classes=91)
+    
+    # Configuring the model's neck
+    fpn_block = FPNBlock
+    
+    in_channels = [256, 512, 1024, 2048]
+    out_channels = 256
+    
+    num_outs = 5
+    
+    fpn = FPNNeck(fpn_block, in_channels, out_channels, num_outs)
+    
+    # Configuring the model's head
+    in_channels = 256
+    retinanet = RetinaNetHead(in_channels)
+
+    # Building the model
     builder = NeuralNetBuilder()
-    builder.set_backbone(MobileNetBackbone())
-    builder.set_neck(MobileNetNeck())
-    builder.set_head(MobileNetHead())
     
-    return builder.build_model()
+    builder.build_backbone(resnet)
+    builder.build_neck(fpn)
+    builder.build_head(retinanet)
 
-def resnet():
-    '''
-    Builds a ResNet model.
-    '''
-    builder = NeuralNetBuilder()
-    builder.set_backbone(ResNetBackbone())
-    builder.set_neck(ResNetNeck())
-    builder.set_head(ResNetHead())
-    
-    return builder.build_model()
-
-# def ssd():
-#     '''
-#     Builds an SSD model.
-#     '''
-#     builder = NeuralNetBuilder()
-#     builder.set_backbone(SSDBackbone())
-#     builder.set_neck(SSDNeck())
-#     builder.set_head(SSDHead())
-    
-#     return builder.build_model()
+    return builder.get_model()
