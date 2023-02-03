@@ -8,7 +8,7 @@ from src.models.model_factory import ModelFactory
 
 from src.models.builders.model_builder import NeuralNetBuilder
 
-from src.models.detection import resnet_fpn_retinanet
+from src.models.detection import resnet50_fpn_retinanet
 
 # Built-in models
 from torchvision.models.detection import (fasterrcnn_resnet50_fpn, 
@@ -39,6 +39,7 @@ def loss_fn(output, targets):
     '''
     losses = {}
     
+    # TODO: Need to address error: "TypeError: list indices must be integers or slices, not str"
     loc_loss = F.smooth_l1_loss(output["bbox_regression"], targets["bbox_regression"])
     conf_loss = F.binary_cross_entropy_with_logits(output["cls_logits"], targets["cls_logits"])
     
@@ -51,7 +52,7 @@ def loss_fn(output, targets):
 data_path = Path("/workspaces/pytorch-od-template/datasets/v1/")
 
 # Get model
-model = resnet_fpn_retinanet()
+model = resnet50_fpn_retinanet()
 
 # model = fasterrcnn_resnet50_fpn(weights = "COCO_V1", pretrained=True)
 

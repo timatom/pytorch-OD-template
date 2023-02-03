@@ -37,10 +37,10 @@ class ModelFactory:
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
             
             # Forward pass
-            output = self.model(images)
+            outputs = self.model(images)
             
             # Compute the loss
-            losses = self.loss_fn(output, targets)
+            losses = self.loss_fn(outputs, targets)
             
             # Compute the total loss
             loss = sum(loss for loss in losses.values())
