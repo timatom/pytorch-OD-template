@@ -8,46 +8,51 @@ Note: Function name typically takes the form of {backbone}_{neck}_{head}. The re
 from src.models.builders.model_builder import NeuralNetBuilder
 
 # Import custom architectures
-from src.models.archs.resnet import ResNetBackbone
-from src.models.archs.fpn import FPNNeck
-from src.models.archs.retinanet import RetinaNetHead
+from src.models.archs.backbones.resnet import ResNet50Backbone
+from src.models.archs.necks.fpn import FPNNeck
+from src.models.archs.heads.retinanet import RetinaNetHead
 
 # Import custom architectures blocks and bottlenecks
 from src.models.archs.blocks.resnet import ResNetBlock, ResNetBottleneck
 from src.models.archs.blocks.fpn import FPNBlock
 
-def resnet_fpn_retinanet():
+def resnet50_fpn_retinanet():
     '''
     Builds a model with a custom head, backbone, and neck.
     '''
-    # Configuring the model's backbone
-    in_channels = 3
-    out_channels = 64
+    # Configuring the model's input
+    batch_size = 4
+    backbone_channels = 3
+    width = 300
+    height = 300
     
-    resnet_block = ResNetBlock
-    resnet_block_layers = [3, 4, 6, 3]
+    num_classes = 91
     
-    resnet = ResNetBackbone(resnet_block, resnet_block_layers, num_classes=91)
+    # Configuring the model's backbone    
+    input_shape = (batch_size, backbone_channels, width, height)
+    
+    backbone = ResNet50Backbone(input_shape=input_shape)
+    
+    backbone_output_shape = backbone.get_output_shape()
     
     # Configuring the model's neck
-    fpn_block = FPNBlock
+    input_shape = backbone_output_shape
+    neck_channels = 256 # The number of channels in the FPN output
     
-    in_channels = [256, 512, 1024, 2048]
-    out_channels = 256
+    neck = FPNNeck(input_shape, neck_channels)
     
-    num_outs = 5
-    
-    fpn = FPNNeck(fpn_block, in_channels, out_channels, num_outs)
+    neck_output_shape = neck.get_output_shape()
     
     # Configuring the model's head
-    in_channels = 256
-    retinanet = RetinaNetHead(in_channels)
+    head = RetinaNetHead(num_classes, neck_output_shape)
+    
+#     classification, regression = retinanet_head(neck_output_shape)
 
     # Building the model
     builder = NeuralNetBuilder()
     
-    builder.build_backbone(resnet)
-    builder.build_neck(fpn)
-    builder.build_head(retinanet)
+    builder.build_backbone(backbone)
+    builder.build_neck(neck)
+    builder.build_head(head)
 
     return builder.get_model()
